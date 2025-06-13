@@ -1,0 +1,1 @@
+export const WEB3_INSTANCE = 'WEB3_INSTANCE';
