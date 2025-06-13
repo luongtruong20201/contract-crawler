@@ -18,7 +18,7 @@ import { REPOSITORIES } from 'src/repositories';
         password: configService.get<string>(EEnv.DB_PASSWORD),
         database: configService.get<string>(EEnv.DB_DATABASE),
         synchronize: true, // Set to false in production
-        logging: true,
+        logging: false,
         entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
       }),
     }),

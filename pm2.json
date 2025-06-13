@@ -1,0 +1,22 @@
+{
+    "apps": [
+        {
+            "name": "api",
+            "script": "yarn start:dev",
+            "args": "",
+            "instances": 1
+        },
+        {
+            "name": "producer",
+            "script": "yarn console crawler --name producer",
+            "args": "",
+            "instances": 1
+        },
+        {
+            "name": "consumer",
+            "script": "yarn console crawler --name consumer",
+            "args": "",
+            "instances": 1
+        }
+    ]
+}
