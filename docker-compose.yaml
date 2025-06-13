@@ -10,3 +10,9 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
     ports:
       - '${DB_PORT}:5432'
+
+  redis:
+    image: redis:latest
+    container_name: redis-bayc
+    ports:
+      - '${REDIS_PORT}:6379'

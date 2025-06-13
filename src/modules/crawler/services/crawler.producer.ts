@@ -6,6 +6,9 @@ import { Web3Service } from 'src/shared/modules/web3/web3.service';
 import { ICrawlerJob } from '../interfaces/crawler-job.interface';
 import { sleepInSeconds } from 'src/shared/utils/time';
 import { CrawlerEntity } from 'src/entities/crawler.entity';
+import { InjectQueue } from '@nestjs/bull';
+import { EQueueName } from 'src/enums/queue.enum';
+import { Queue } from 'bull';
 
 @Injectable()
 export class CrawlerProducer {
@@ -17,6 +20,7 @@ export class CrawlerProducer {
     private readonly web3Service: Web3Service,
     private readonly configService: ConfigService,
     private readonly crawlerRepository: CrawlerRepository,
+    @InjectQueue(EQueueName.CONTRACT_CRAWLER) private readonly queue: Queue,
   ) {
     this.maxBlockRange = this.configService.get<number>(EEnv.MAX_BLOCK_RANGE)!;
     this.minBlockRange = this.configService.get<number>(EEnv.MIN_BLOCK_RANGE)!;
@@ -36,7 +40,7 @@ export class CrawlerProducer {
         const latestBlock = Number(networkLatestBlock);
 
         if (crawler.blockNumber + this.minBlockRange >= latestBlock) {
-          console.log(
+          this.logger.log(
             `Not enough blocks to crawl. latestBlock: ${latestBlock} --- currentBlock: ${crawler.blockNumber}. Waiting...`,
           );
           await sleepInSeconds(5);
@@ -55,7 +59,20 @@ export class CrawlerProducer {
         crawlerRecord = crawler;
         break;
       }
-      console.log(
+
+      await this.queue.add(job, {
+        removeOnComplete: {
+          age: 1000 * 60 * 60 * 24,
+        },
+        removeOnFail: false,
+        attempts: 5,
+        backoff: {
+          type: 'fixed',
+          delay: 1000 * 60 * 5,
+        },
+        delay: 0,
+      });
+      this.logger.log(
         `Job created: fromBlock: ${job.fromBlock}, toBlock: ${job.toBlock}`,
       );
 
