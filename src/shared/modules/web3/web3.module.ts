@@ -4,6 +4,7 @@ import { WEB3_INSTANCE } from 'src/constants/web3.constant';
 import { EEnv } from 'src/enums/env.enum';
 import { Web3 } from 'web3';
 import { ERC721ContractFactory } from './erc721-contract';
+import { Web3Service } from './web3.service';
 
 @Global()
 @Module({
@@ -16,7 +17,8 @@ import { ERC721ContractFactory } from './erc721-contract';
       inject: [ConfigService],
     },
     ERC721ContractFactory,
+    Web3Service,
   ],
-  exports: [WEB3_INSTANCE, ERC721ContractFactory],
+  exports: [ERC721ContractFactory, Web3Service],
 })
 export class Web3Module {}
